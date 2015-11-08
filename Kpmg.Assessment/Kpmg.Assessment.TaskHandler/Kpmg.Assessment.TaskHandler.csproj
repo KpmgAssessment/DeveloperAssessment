@@ -72,6 +72,8 @@
   <ItemGroup>
     <Compile Include="BaseCanConsume.cs" />
     <Compile Include="BaseCanProduce.cs" />
+    <Compile Include="ClassAdditions\TransactionDataModel.cs" />
+    <Compile Include="ClassAdditions\ValidationResultModel.cs" />
     <Compile Include="Interfaces\IAmConsumerProperty.cs" />
     <Compile Include="RegionHelper.cs" />
     <Compile Include="Consumer.cs" />

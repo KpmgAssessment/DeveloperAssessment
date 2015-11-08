@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kpmg.Assessment.DataAccess", "Kpmg.Assessment\Kpmg.Assessment.DataAccess.csproj", "{6B01238C-7293-49D2-B00A-87973D05DB4B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kpmg.Assessment.Common", "Kpmg.Assessment.Common\Kpmg.Assessment.Common.csproj", "{2AD65860-A82F-4E59-8375-DB1CD254192C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kpmg.Assessment.TaskHandler", "Kpmg.Assessment.TaskHandler\Kpmg.Assessment.TaskHandler.csproj", "{A75B1674-BB9E-4E30-95E2-958C4C0E8C9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kpmg.Assessment.MultipartMediaFormatter", "Kpmg.Assessment.MultipartMediaFormatter\Kpmg.Assessment.MultipartMediaFormatter.csproj", "{61D38B00-4805-457C-93A4-E13FAE556445}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kpmg.Assessment.WebApi", "Kpmg.Assessment.WebApi\Kpmg.Assessment.WebApi.csproj", "{1C27A3AC-CEA1-45D3-91A5-9A7F7F21CA28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kpmg.Assessment.UIClient", "Kpmg.Assessment.UIClient\Kpmg.Assessment.UIClient.csproj", "{F5955896-C121-4410-A2DC-9395A1C15A8D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B01238C-7293-49D2-B00A-87973D05DB4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B01238C-7293-49D2-B00A-87973D05DB4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B01238C-7293-49D2-B00A-87973D05DB4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B01238C-7293-49D2-B00A-87973D05DB4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AD65860-A82F-4E59-8375-DB1CD254192C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AD65860-A82F-4E59-8375-DB1CD254192C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AD65860-A82F-4E59-8375-DB1CD254192C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AD65860-A82F-4E59-8375-DB1CD254192C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A75B1674-BB9E-4E30-95E2-958C4C0E8C9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A75B1674-BB9E-4E30-95E2-958C4C0E8C9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A75B1674-BB9E-4E30-95E2-958C4C0E8C9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A75B1674-BB9E-4E30-95E2-958C4C0E8C9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61D38B00-4805-457C-93A4-E13FAE556445}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61D38B00-4805-457C-93A4-E13FAE556445}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61D38B00-4805-457C-93A4-E13FAE556445}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61D38B00-4805-457C-93A4-E13FAE556445}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C27A3AC-CEA1-45D3-91A5-9A7F7F21CA28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C27A3AC-CEA1-45D3-91A5-9A7F7F21CA28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C27A3AC-CEA1-45D3-91A5-9A7F7F21CA28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C27A3AC-CEA1-45D3-91A5-9A7F7F21CA28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5955896-C121-4410-A2DC-9395A1C15A8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5955896-C121-4410-A2DC-9395A1C15A8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5955896-C121-4410-A2DC-9395A1C15A8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5955896-C121-4410-A2DC-9395A1C15A8D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
