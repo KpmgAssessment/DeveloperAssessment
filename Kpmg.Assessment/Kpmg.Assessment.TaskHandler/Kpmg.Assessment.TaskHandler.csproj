@@ -82,7 +82,6 @@
     <Compile Include="Interfaces\IAmConsumerProperty.cs" />
     <Compile Include="RegionHelper.cs" />
     <Compile Include="Consumer.cs" />
-    <Compile Include="CurrencyCodeEnum.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Interfaces\IAmTaskHandlerProperty.cs" />
     <Compile Include="Interfaces\IAmValidationProperty.cs" />
