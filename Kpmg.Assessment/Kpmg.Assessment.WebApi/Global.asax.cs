@@ -1,8 +1,5 @@
 ﻿using Kpmg.Assessment.MultipartMediaFormatter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -20,6 +17,7 @@ namespace Kpmg.Assessment.WebApi
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
+            GlobalConfiguration.Configuration.Formatters.Add(new JsonMediaTypeFormatter());
             //Register the custom multipart media formatter
             GlobalConfiguration.Configuration.Formatters.Add(new FormMultipartEncodedMediaTypeFormatter());
 

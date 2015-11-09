@@ -10,6 +10,6 @@ namespace Kpmg.Assessment.TaskHandler.Interfaces
         where T : class where U : class
     {
         void StartConsuming(int batchSize);
-        void ProcessErrors(int batchSize);
+        ICollection<ValidationResult> ProcessErrors(int batchSize);
     }
 }

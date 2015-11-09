@@ -7,9 +7,10 @@ namespace Kpmg.Assessment.Common
 {
     public static class UnityConfig
     {
+        public static UnityContainer container;
         public static void RegisterComponents()
         {
-			UnityContainer container = new UnityContainer();
+			container = new UnityContainer();
 
             //Setting IoC for Readonly objects...
             container.RegisterType<IReadOnlyDataProvider<TransactionData>, ReadOnlyTransactionDataProvider>(new HierarchicalLifetimeManager());

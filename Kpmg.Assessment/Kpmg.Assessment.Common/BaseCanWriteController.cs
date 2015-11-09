@@ -57,15 +57,17 @@ namespace Kpmg.Assessment.Common
         }
 
         [HttpDelete]
-        public IHttpActionResult DeleteAsync(ICollection<T> entities)
+        public IHttpActionResult DeleteAsync(ICollection<int> ids)
         {
-            throw new NotImplementedException();
+            int result = Task.Run(() => { return ICanWriteDataProvider.Delete(ids); }).Result;
+
+            return Ok(result);
         }
 
         [HttpDelete]
-        public IHttpActionResult DeleteAsync(T entity)
+        public IHttpActionResult DeleteAsync(int id)
         {
-            int result = Task.Run(() => { return ICanWriteDataProvider.Delete(entity); }).Result;
+            int result = ICanWriteDataProvider.Delete(id);
             return Ok(result);
         }
 

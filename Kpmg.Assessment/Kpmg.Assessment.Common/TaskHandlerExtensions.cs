@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -12,14 +13,17 @@ namespace Kpmg.Assessment.Common
 {
     public static class TaskHandlerExtensions
     {
-        public static void TriggerConsumers<T, U>(this ICanConsume<T, U> consumer, ref BlockingCollection<T> dataQueue, ref BlockingCollection<U> errorQueue) 
+
+        public static ICollection<ValidationResult> TriggerConsumers<T, U>(this ICanConsume<T, U> consumer, ref BlockingCollection<T> dataQueue, ref BlockingCollection<U> errorQueue) 
             where T : class where U : class
         {
             consumer.ValidDataQueue = dataQueue;
             consumer.ValidationResultQueue = errorQueue;
 
-            Task.Run(() => { consumer.StartConsuming(batchSize: 500); });
-            Task.Run(() => { consumer.ProcessErrors(batchSize: 500); });
+            consumer.StartConsuming(batchSize: 500);
+            return consumer.ProcessErrors(batchSize: 500);
+            //Task.Run(() => { consumer.StartConsuming(batchSize: 500); });
+            //Task.Run(() => { consumer.ProcessErrors(batchSize: 500); });
         }
 
         public static ProducerTaskResult TriggerProducer<T, U>(this ICanProduce<T, U> producer, ref BlockingCollection<T> dataQueue, ref BlockingCollection<U> errorQueue) 
@@ -33,7 +37,7 @@ namespace Kpmg.Assessment.Common
             producer.ValidDataQueue = dataQueue;
             producer.ValidationResultQueue = errorQueue;
 
-            return Task.Run(() => { return producer.StartProducing(); }).Result;
+            return producer.StartProducing();
         }
     }
 }

@@ -16,27 +16,27 @@ namespace Kpmg.Assessment.TaskHandler
         /// <returns>Generic list of RegionInfo</returns>
         public static List<RegionInfo> GetRegionList()
         {
-            List<RegionInfo> cultureList = new List<RegionInfo>();
+            List<RegionInfo> regionList = new List<RegionInfo>();
 
             //create an array of CultureInfo to hold all the cultures found, these include the users local cluture, and all the
             //cultures installed with the .Net Framework
-            CultureInfo[] cultures = CultureInfo.GetCultures(CultureTypes.AllCultures & ~CultureTypes.NeutralCultures);
+            CultureInfo[] culturesArray = CultureInfo.GetCultures(CultureTypes.AllCultures);
+            List<CultureInfo> cultures = culturesArray.Where(c => c.IsNeutralCulture == false && c.LCID != 127 && c.ThreeLetterISOLanguageName != "ivl").ToList();
 
-            ParallelOptions options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
-
-            Parallel.ForEach(cultures, options, culture =>
+            foreach(CultureInfo culture in cultures)
             {
-                //pass the current culture's Locale ID (http://msdn.microsoft.com/en-us/library/0h88fahh.aspx)
-                //to the RegionInfo contructor to gain access to the information for that culture
                 RegionInfo region = new RegionInfo(culture.LCID);
 
-                if (!(cultureList.Contains(region)))
+                if(region != null)
                 {
-                    cultureList.Add(region);
+                    if (!regionList.Contains(region))
+                    {
+                        regionList.Add(region);
+                    }
                 }
-            });
+            }
 
-            return cultureList;
+            return regionList;
         }
     }
 

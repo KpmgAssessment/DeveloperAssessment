@@ -17,10 +17,17 @@ namespace Kpmg.Assessment.TaskHandler
         where T : class, IAmValidDataProperty
         where U : class, IAmValidationProperty
     {
+        static object _lock = new object();
+
         public virtual BlockingCollection<T> ValidDataQueue { get; set; }
+
         public virtual BlockingCollection<U> ValidationResultQueue { get; set; }
+
         public virtual string TemporaryDirectory { get; set; }
 
+        //The idea here is to throttle the volume of threads spun in each method..
+        //Hence why it's being scheduled to run synchronously, even though the operations
+        //in methods are fully async...saves on memory usage and processor hogging..
         public virtual ProducerTaskResult StartProducing()
         {
             TransformExcelFilesToCsv();
@@ -85,6 +92,9 @@ namespace Kpmg.Assessment.TaskHandler
                         {
                             using (CsvReader csv = new CsvReader(sr, true, ','))
                             {
+                                csv.MissingFieldAction = MissingFieldAction.ReplaceByNull;
+                                csv.DefaultParseErrorAction = ParseErrorAction.AdvanceToNextLine;
+
                                 int fieldCount = csv.FieldCount;
                                 string[] headers = csv.GetFieldHeaders();
 
@@ -166,45 +176,43 @@ namespace Kpmg.Assessment.TaskHandler
         /// triggered the failure</returns>
         internal virtual FeedbackResult ValidateCurrentRow(string[] currRow, string[] headers)
         {
-            FeedbackResult result = new FeedbackResult();
-            CancellationTokenSource tokenSource = new CancellationTokenSource();
-
-            int currCode = Array.IndexOf(headers, "CurrencyCode");
-
-            for (int i = 0; i < currRow.Length; i++)
+            lock (_lock)
             {
-                if(currRow[i].Length > 0 == false)
+                List<RegionInfo> allRegions = RegionHelper.GetRegionList();
+                FeedbackResult result = new FeedbackResult();
+                CancellationTokenSource tokenSource = new CancellationTokenSource();
+
+                int currCode = Array.IndexOf(headers, "CurrencyCode");
+
+                for (int i = 0; i < currRow.Length; i++)
                 {
-                    result.Valid = false;
-                    result.FailedField = headers[i];
-                    result.Message = "No data provided for field";
-
-                    return result;
-                }
-
-                if(i == currCode)
-                {
-                    List<RegionInfo> allRegions = RegionHelper.GetRegionList();
-                    ParallelOptions option = new ParallelOptions
+                    if (currRow[i] == null || currRow[i].Length <= 0)
                     {
-                        MaxDegreeOfParallelism = Environment.ProcessorCount,
-                        CancellationToken = tokenSource.Token
-                    };
-
-                    Parallel.ForEach(allRegions, option, region =>
-                    {
-                        if(Equals(region.ISOCurrencySymbol, currCode))
-                        {
-                            tokenSource.Cancel();
-                        }
-
                         result.Valid = false;
                         result.FailedField = headers[i];
-                        result.Message = "No valid ISO 4217 CurrencyCode found.";
-                    });
+                        result.Message = "No data provided for field";
+
+                        return result;
+                    }
+
+                    if (i == currCode)
+                    {
+                        RegionInfo region = allRegions.Where(r => r != null && r.ISOCurrencySymbol == currRow[currCode]).FirstOrDefault();
+                        if (region == null)
+                        {
+                            result.Valid = false;
+                            result.FailedField = headers[i];
+                            result.Message = "No valid ISO 4217 CurrencyCode found.";
+
+                            return result;
+                        }
+
+                    }
                 }
+
+                result.Valid = true;
+                return result;
             }
-            return result;
         }
     }
 }

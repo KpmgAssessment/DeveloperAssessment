@@ -14,7 +14,13 @@ namespace Kpmg.Assessment.WebApi
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
-            GlobalConfiguration.Configuration.Services.Replace(typeof(IAssembliesResolver), new DynamicAssembliesResolver());
+            //The idea here was to dynamically load all controllers, the benefits to this approach
+            //is that controllers would not have to be part of the api project, it can be dynamically
+            //dropped into any specified location and dynamically bootstrapped to the application
+
+            //However i decided to disable this feature as i felt it was an overkill in this scenario..
+            //The DynamicsAssembliesResolver class is responsible for bootstrapping external assemblies
+            //GlobalConfiguration.Configuration.Services.Replace(typeof(IAssembliesResolver), new DynamicAssembliesResolver());
             GlobalConfiguration.Configuration.Filters.Add(new TransformExceptionFilter());
 
             // Web API routes
@@ -22,10 +28,11 @@ namespace Kpmg.Assessment.WebApi
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
+                routeTemplate: "api/{controller}/{action}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
 
+            //config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new System.Net.Http.Headers.MediaTypeHeaderValue("text/html"));
             //Set up the json serializer to default to camel casing..
             config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }

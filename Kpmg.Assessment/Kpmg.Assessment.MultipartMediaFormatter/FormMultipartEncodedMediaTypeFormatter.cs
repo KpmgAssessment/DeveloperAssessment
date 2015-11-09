@@ -28,7 +28,7 @@ namespace Kpmg.Assessment.MultipartMediaFormatter
         }
 
         /// <summary>
-        /// Ensures that the property is accessible from the current scope
+        /// Validation logic to instruct the formatter of types it can serialize
         /// </summary>
         /// <param name="type"></param>
         /// <returns>bool</returns>
@@ -38,7 +38,7 @@ namespace Kpmg.Assessment.MultipartMediaFormatter
         }
 
         /// <summary>
-        /// Ensures that the property is writable from current scope
+        /// Validation logic to instruct the formatter of types it can serialize
         /// </summary>
         /// <param name="type"></param>
         /// <returns>bool</returns>

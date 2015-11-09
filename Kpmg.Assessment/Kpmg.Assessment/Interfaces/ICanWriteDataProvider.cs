@@ -12,7 +12,7 @@ namespace Kpmg.Assessment.Interfaces
         int Create(ICollection<T> entities);
         int Update(T entity);
         int Update(ICollection<T> entities);
-        int Delete(T entity);
-        int Delete(ICollection<T> entities);
+        int Delete(int id);
+        int Delete(ICollection<int> id);
     }
 }

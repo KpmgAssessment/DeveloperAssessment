@@ -7,6 +7,9 @@ using Microsoft.Practices.Unity;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 
@@ -45,13 +48,28 @@ namespace Kpmg.Assessment.Common
         [SaveToDisk]
         public IHttpActionResult HandleFiles(FileUploadModel upload)
         {
-            Consumer.TriggerConsumers(ref _dataQueue, ref _validationResultQueue);
-
+            upload = null;
             Producer.TemporaryDirectory = tempDirectory;
-            ProducerTaskResult feedback = Producer.TriggerProducer(ref _dataQueue, ref _validationResultQueue);
+            ProducerTaskResult producerResult = Producer.TriggerProducer(ref _dataQueue, ref _validationResultQueue);
+
+            ICollection<ValidationResult> uploadFailures = Consumer.TriggerConsumers(ref _dataQueue, ref _validationResultQueue);
+            FeedbackToClient feedback = new FeedbackToClient { SuccessUploadCount = producerResult.ValidCount, UploadValidationFailures = uploadFailures };
+
             string feedbackAsJson = JsonConvert.SerializeObject(feedback);
 
             return Ok(feedbackAsJson);
+        }
+
+        [HttpPut]
+        public IHttpActionResult Update(TransactionData model)
+        {
+            return UpdateAsync(model);
+        }
+
+        [HttpDelete]
+        public IHttpActionResult Delete(int id)
+        {
+            return DeleteAsync(id);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using EntityFramework.BulkInsert.Extensions;
+using Kpmg.Assessment.TaskHandler.ClassAdditions;
 using Kpmg.Assessment.TaskHandler.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +16,10 @@ namespace Kpmg.Assessment.TaskHandler
     public abstract class BaseCanConsume<T, U> : ICanConsume<T, U>
         where T : class where U : class
     {
+        ICollection<ValidationResult> failedValidation = new List<ValidationResult>();
+
+        static object _lock = new object();
+        public ICollection<ValidationResult> FailedValidation { get; set;}
         public virtual BlockingCollection<T> ValidDataQueue { get; set; }
         public virtual BlockingCollection<U> ValidationResultQueue { get; set; }
 
@@ -22,44 +28,48 @@ namespace Kpmg.Assessment.TaskHandler
             DoConsumption(batchSize, ValidDataQueue);
         }
 
-        public virtual void ProcessErrors(int batchSize)
+        public virtual ICollection<ValidationResult> ProcessErrors(int batchSize)
         {
-            DoConsumption(batchSize, ValidationResultQueue);
+            return DoConsumption(batchSize, ValidationResultQueue);
         }
 
-        private void DoConsumption<X>(int batchSize, BlockingCollection<X> dataQueue)
+        private ICollection<ValidationResult> DoConsumption<X>(int batchSize, BlockingCollection<X> dataQueue)
         {
             bool keepConsuming = true;
 
-            try
+            while (keepConsuming)
             {
-                while (!keepConsuming)
+                while (!dataQueue.IsCompleted)
                 {
-                    while (!ValidDataQueue.IsCompleted)
-                    {
-                        CancellationTokenSource tokenSource = new CancellationTokenSource();
-                        IEnumerable<X> toPersist = dataQueue.GetConsumingEnumerable(tokenSource.Token).ToList();
+                    CancellationTokenSource tokenSource = new CancellationTokenSource();
+                    IEnumerable<X> toPersist = dataQueue.GetConsumingEnumerable(tokenSource.Token).ToList();
 
-                        Task.Run(async () => { await CommitToDatabase(batchSize, tokenSource.Token, toPersist.ToList()); });
-                    }
+                    CommitToDatabase(batchSize, tokenSource.Token, toPersist.ToList()).Wait();
+                    //Task.Run(async () => { await CommitToDatabase(batchSize, tokenSource.Token, toPersist.ToList()); });
+                }
 
-                    if (ValidDataQueue.IsCompleted)
-                    {
-                        keepConsuming = false;
-                    }
+                if (dataQueue.IsCompleted)
+                {
+                    keepConsuming = false;
                 }
             }
-            catch (Exception ex)
-            {
 
+            if(dataQueue is BlockingCollection<ValidationResultModel> && !keepConsuming)
+            {
+                return failedValidation;
             }
+
+            return null;
         }
 
-        private static async Task CommitToDatabase<Y>(int batchSize, CancellationToken token, ICollection<Y> entities)
+        private async Task CommitToDatabase<Y>(int batchSize, CancellationToken token, ICollection<Y> entities)
         {
             try
             {
-                int totalConsumed = 0;
+                //Ideally this should reside at the global level i.e in global.asax
+                AutoMapper.Mapper.CreateMap<TransactionDataModel, TransactionData>();
+                AutoMapper.Mapper.CreateMap<ValidationResultModel, ValidationResult>();
+
                 TransactionOptions transactionOptions = new TransactionOptions
                 {
                     IsolationLevel = System.Transactions.IsolationLevel.Serializable,
@@ -77,11 +87,41 @@ namespace Kpmg.Assessment.TaskHandler
                             EnableStreaming = true
                         };
 
-                        context.BulkInsert(entities, insertOptions);
+                        if(entities is ICollection<TransactionDataModel>)
+                        {
+                            List<TransactionData> toBeSaved = new List<TransactionData>();
+
+                            Parallel.ForEach(entities, entity =>
+                            {
+                                TransactionData result = AutoMapper.Mapper.Map<TransactionData>(entity);
+                                lock(_lock)
+                                {
+                                    toBeSaved.Add(result);
+                                }
+                            });
+
+                            context.BulkInsert(toBeSaved, insertOptions);
+
+                        }
+                        else if(entities is ICollection<ValidationResultModel>)
+                        {
+                            List<ValidationResult> toBeSaved = new List<ValidationResult>();
+
+                            Parallel.ForEach(entities, entity =>
+                            {
+                                ValidationResult result = AutoMapper.Mapper.Map<ValidationResult>(entity);
+                                lock (_lock)
+                                {
+                                    toBeSaved.Add(result);
+                                    failedValidation.Add(result);
+                                }
+                            });
+
+                            context.BulkInsert(toBeSaved, insertOptions);
+                        }
+
                         await context.SaveChangesAsync(token);
                         transactionScope.Complete();
-
-                        Interlocked.Add(ref totalConsumed, batchSize);
                     }
                 }
             }

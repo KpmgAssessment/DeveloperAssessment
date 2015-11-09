@@ -26,14 +26,18 @@ namespace Kpmg.Assessment.Common.Filter
             if(actionContext.ActionArguments.TryGetValue("upload", out upload))
             {
                 FileUploadModel uploadModel = (FileUploadModel)upload;
-                if(uploadModel != null && uploadModel.Binary.Buffer != null)
+                if (uploadModel != null && uploadModel.Binary!= null)
                 {
                     //Was initially peeking the file's extension, but determined it was unncessary
                     // as it needs to be saved to disk regardless...
-                    string fileExtension = Path.GetExtension(uploadModel.Filename);
+                    string fileExtension = Path.GetExtension(uploadModel.Binary.Filename);
                     string tempLocation = HttpContext.Current.Server.MapPath("~/App_Data");
 
-                    File.WriteAllBytes(Path.Combine(new[] { tempLocation, uploadModel.Filename }), uploadModel.Binary.Buffer);
+                    if (!Directory.Exists(tempLocation))
+                    {
+                        Directory.CreateDirectory(tempLocation);
+                    }
+                    File.WriteAllBytes(Path.Combine(new[] { tempLocation, uploadModel.Binary.Filename }), uploadModel.Binary.Buffer);
                 }
                 else
                 {

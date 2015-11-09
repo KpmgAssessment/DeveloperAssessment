@@ -45,8 +45,8 @@ namespace Kpmg.Assessment.MultipartMediaFormatter.Converters
             {
                 string name = UnquoteToken(file.Headers.ContentDisposition.Name);
                 string fileName = FixFilename(file.Headers.ContentDisposition.FileName);
-                string mediaType = file.Headers.ContentType.MediaType;
-
+                //string mediaType = file.Headers.ContentType.MediaType;
+                string mediaType = string.Empty;
                 using (Stream stream = await file.ReadAsStreamAsync())
                 {
                     byte[] buffer = ReadAllBytes(stream);

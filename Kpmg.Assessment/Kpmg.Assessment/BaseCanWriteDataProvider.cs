@@ -74,12 +74,17 @@ namespace Kpmg.Assessment
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public virtual int Delete(ICollection<T> entities)
+        public virtual int Delete(ICollection<int> ids)
         {
             ParallelOptions options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
-            Parallel.ForEach(entities, options, entity => { EntitySet.Remove(entity); });
+            Parallel.ForEach(ids, options, id => 
+            {
+                T dbEntity = GetById(id);
+                DbEntityEntry dbEntityEntry = DatabaseProvider.Entry(dbEntity);
+                dbEntityEntry.State = System.Data.Entity.EntityState.Deleted;
+            });
 
-            return Task.Run(async () => { return await DatabaseProvider.SaveChangesAsync(); }).Result;
+            return DatabaseProvider.SaveChangesAsync().Result;
         }
 
         /// <summary>
@@ -87,9 +92,9 @@ namespace Kpmg.Assessment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public virtual int Delete(T entity)
+        public virtual int Delete(int id)
         {
-            return Delete(new T[] { entity });
+            return Delete(new int[] { id });
         }
 
         /// <summary>
@@ -107,16 +112,6 @@ namespace Kpmg.Assessment
                 {
                     dbEntityEntry.State = System.Data.Entity.EntityState.Modified;
                     Database.SaveChangesAsync();
-
-                    //int id = Convert.ToInt32(dbEntityEntry.Property("Id").CurrentValue);
-                    //List<T> itemCollection = DatabaseProvider.Set<T>().Where(item => true).ToList();
-                    //T dbEntity = itemCollection.FirstOrDefault(item => MatchItemById(item, id));
-
-                    //if(dbEntity != null)
-                    //{
-                    //    dbEntityEntry.State = System.Data.Entity.EntityState.Modified;
-                    //    DatabaseProvider.SaveChanges();
-                    //}
                 }
             });
 
