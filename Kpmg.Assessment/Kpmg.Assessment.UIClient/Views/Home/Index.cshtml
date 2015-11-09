@@ -1,0 +1,19 @@
+﻿
+<div class="jumbotron">
+    <h1>DASHBOARD</h1>
+    <p class="lead">Below is a snapshot of all successfully uploaded transaction data in the database.</p>
+    <p><a href="@Url.Action("DoUpload", "Upload")" class="btn btn-primary btn-lg">Upload Transaction Data >></a></p>
+</div>
+
+@{ Html.RenderPartial("_TransactionDataList"); }
+
+@section confirmDialog{
+
+    @{ Html.RenderPartial("_confirmdialog"); }
+}
+
+@section Scripts {
+
+    @Scripts.Render("~/bundles/jqueryval")
+
+}

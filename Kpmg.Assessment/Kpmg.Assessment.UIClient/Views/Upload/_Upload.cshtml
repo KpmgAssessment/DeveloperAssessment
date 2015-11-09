@@ -1,0 +1,60 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+
+
+<style type="text/css">
+    #dropZone {
+        background: gray;
+        border: black dashed 3px;
+        width: 200px;
+        padding: 50px;
+        text-align: center;
+        color: white;
+    }
+</style>
+
+
+<script type="text/javascript">
+    jQuery(function ($) {
+        $('#dropZone').filedrop({
+            url: 'http://localhost:51161/TransactionData/Upload',
+            paramname: 'Binary',
+            maxFiles: 10,
+            queuefiles: 5,
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+            allowedfiletypes: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'],
+            allowedfileextensions: ['.xlsx', '.csv'], // file extensions allowed. Empty array means no restrictions
+            dragOver: function () {
+                $('#dropZone').css('background', 'blue');
+            },
+            dragLeave: function () {
+                $('#dropZone').css('background', 'gray');
+            },
+            drop: function () {
+                $('#dropZone').css('background', 'gray');
+            },
+            afterAll: function () {
+                $('#dropZone').html('The file(s) have been uploaded successfully!');
+            },
+            uploadFinished: function (i, file, response, time) {
+                $('#uploadResult').append('<li>' + file.name + '</li>');
+            }
+        });
+    });
+</script>
+
+<h2>File Drag & Drop Upload Demo</h2>
+<div id="dropZone">Drop your files here</div>
+<br />
+Uploaded Files:
+<ul id="uploadResult"></ul>
+
+<form method="POST" action="@Url.Action("Upload", "TransactionData")" id="UploadForm" enctype="multipart/form-data">
+    <input type="file" multiple="multiple" name="fileUploads" />
+
+    <input type="submit" value="Upload" />
+</form>

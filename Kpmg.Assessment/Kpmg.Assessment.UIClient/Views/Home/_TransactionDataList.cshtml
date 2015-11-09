@@ -1,0 +1,62 @@
+﻿@using Kpmg.Assessment.UIClient.Models;
+@using GridMvc.Html;
+
+@{
+    ICollection<TransactionData> collection = TempData["collection"] as ICollection<TransactionData>;
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        @Html.Grid(collection).Columns(columns =>
+   {
+   columns.Add()
+           .Encoded(false)
+           .Sanitized(false)
+           .SetWidth(100)
+           .RenderValueAs(d =>
+        @<b>
+            @Html.ActionLink("Edit Record", "EditTransactionData", new { id = d.Id }, new { @class = "btn btn-primary" })
+            @Html.Hidden("RowId", "", new { @class = "hiddenid" })
+            @*<input type="hidden" value="@d.Id" id="RowId" />*@
+        </b>);
+
+   columns.Add()
+           .Encoded(false)
+           .Sanitized(false)
+           .SetWidth(100)
+           .RenderValueAs(d =>
+        @<b>
+            @Html.ActionLink("Delete", "Delete", "Upload",
+                new { id = d.Id },
+                new
+                {
+                    @id = "#deleteLink",
+                    @class = "modalLink btn btn-default",
+                    href = "#deleteConfirmModal",
+                    data_toggle = "modal",
+                    data_id = d.Id
+                })
+
+        </b>);
+
+       columns.Add(model => model.Id)
+               .Titled("Number").SetWidth(100);
+
+       columns.Add(model => model.Description)
+               .Titled("Description");
+
+       columns.Add(model => model.CurrencyCode)
+               .Titled("Currency Code - ISO 4217").SetWidth(150);
+
+       columns.Add(model => model.Amount)
+           .Titled("Amount (£)").SetWidth(100);
+
+       columns.Add(model => model.UploadDate, "UploadDate")
+               .Titled("Upload Date")
+               .SortInitialDirection(GridMvc.Sorting.GridSortDirection.Ascending)
+               .Format("{0:dd/MM/yyyy}")
+               .SetWidth(120);
+
+   }).SetRowCssClasses(item => item.CurrencyCode == "GBP" ? "warning" : string.Empty).WithPaging(10).Filterable().WithMultipleFilters()
+    </div>
+</div>

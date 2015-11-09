@@ -1,0 +1,86 @@
+﻿@using Kpmg.Assessment.UIClient.Models;
+
+@{
+    FeedbackToClient feedback = ViewBag.UploadResponse as FeedbackToClient;
+    long uploadedCount = feedback == null ? default(long) : feedback.SuccessUploadCount;
+
+    ICollection<ValidationResult> failedUploads = feedback == null ? null : feedback.UploadValidationFailures;
+    int failedUploadCount = failedUploads == null ? default(int) : failedUploads.Count;
+}
+
+@using GridMvc.Html;
+
+<div class="jumbotron">
+
+    <h3>UPLOAD FILE</h3>
+
+    @if (uploadedCount > 0 && failedUploadCount == 0)
+    {
+        <h2>File was successfully uploaded without validation errors.</h2>
+
+        <a href="@Url.Action("Index", "Home")">Back to Dashboard</a>
+    }
+
+    @if (uploadedCount == 0 && failedUploadCount == 0)
+    {
+        <div class="form-group">
+            @using (Html.BeginForm("DoUpload", "Upload", FormMethod.Post,
+                                        new { enctype = "multipart/form-data" }))
+            {
+                @Html.Label("", new { @class = "control-label col-md-2" })
+
+                <div class="col-md-10">
+
+                    <div class="fileUpload btn btn-primary">
+                        <span>Click to Select file </span>
+                        <input id="fileUploads" type="file" class="upload" name="fileUploads" multiple />
+                    </div>
+
+                    <input type="submit" value="Upload" class="btn btn-info" />
+                </div>
+            }
+
+            <div id="selectedFiles"></div>
+        </div>
+    }
+</div>
+
+<div class="row">
+    @{
+        if (failedUploads != null && failedUploads.Count() > 0)
+        {
+            <div class="col-sm-10">
+                <h2 class="text-center">File uploaded to the server.</h2>
+                <span>Total Successful Upload: @uploadedCount</span>
+                <span>Total Unsuccessful Upload: @failedUploadCount</span>
+            </div>
+
+            <div class="col-sm-12">
+                @Html.Grid(failedUploads).Columns(columns =>
+                {
+                    columns.Add(model => model.FailureReason)
+                        .Titled("FailureReason").Sortable(true);
+
+                    columns.Add(model => model.Account)
+                        .Titled("Account").Sortable(true);
+
+                    columns.Add(model => model.Description)
+                            .Titled("Description").Sortable(true);
+
+                    columns.Add(model => model.CurrencyCode)
+                            .Titled("Currency Code - ISO 4217").SetWidth(150).Sortable(true);
+
+                    columns.Add(model => model.Amount)
+                        .Titled("Amount (£)").SetWidth(100).Sortable(true);
+
+                    columns.Add(model => model.UploadDate, "UploadDate")
+                            .Titled("Upload Date")
+                            .SortInitialDirection(GridMvc.Sorting.GridSortDirection.Ascending)
+                            .Format("{0:dd/MM/yyyy}").SetWidth(120);
+
+                }).WithPaging(10).Sortable().Filterable().WithMultipleFilters()
+            </div>
+        }
+    }
+
+</div>
